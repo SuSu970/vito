@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>موقع البطاقات التفاعلي</title>
+<style>
+/* ======= إعدادات الصفحة ======= */
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* لون الخلفية */
+    background-color: rgb(26, 26, 26);
+    /* أو صورة خلفية (أزل التعليق لو أردت) */
+    /* background-image: url('background.jpg'); background-size: cover; */
+}
+
+/* الحاوية التي تحتوي البطاقات */
+.cards-container {
+    display: flex;
+    gap: 20px;
+}
+
+/* إعدادات البطاقة */
+.card {
+    perspective: 1000px;
+    width: 300px;
+    height: 380px;
+    cursor: pointer;
+    opacity: 0; /* تبدأ مخفية */
+    transform: translateY(100%) rotateY(180deg);
+    transition: transform 1s ease, opacity 1s ease;
+}
+
+.card.show {
+    opacity: 1;
+    transform: translateY(0) rotateY(180deg);
+}
+
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card.fade-out {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 1s, transform 1s;
+}
+
+/* الحاوية الداخلية للوجه الأمامي والخلفي */
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    border-radius: 12px;
+}
+
+/* الوجه الأمامي والخلفي */
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* الوجه الأمامي */
+.card-front {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card-front img {
+    width: 80%;
+    height: auto;
+}
+
+/* الوجه الخلفي */
+.card-back {
+    background: #000;
+    transform: rotateY(180deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card-back img {
+    max-width: 200%;
+    max-height: 200%;
+    object-fit: cover;
+}
+
+/* الدوائر داخل البطاقة على الجهة اليمنى */
+.dots {
+    position: absolute;
+    right: 10px; /* المسافة من الحافة اليمنى */
+    top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* المسافة بين الدوائر */
+}
+
+.dot {
+    width: 25px; /* حجم الدائرة (يمكنك تغييره للتكبير/التصغير) */
+    height: 25px;
+    border-radius: 50%;
+    background:  rgb(255, 215, 0); /* لون الدائرة */;
+border: 3px solid rgb(255, 140, 0); /* حدود الدائرة */
+    opacity: 1;
+    cursor: pointer;
+    transition: opacity 0.3s, background 0.3s;
+}
+
+.dot.off {
+    background: rgb(255, 140, 0);
+    opacity: 0.3;
+}
+</style>
+</head>
+<body>
+
+<!-- ======= البطاقات ======= -->
+<div class="cards-container">
+    <!-- البطاقة 1 -->
+    <div class="card" data-dots="6">
+        <div class="card-inner">
+            <div class="card-front"><img src="logo.png" alt="الوجه الأمامي"></div>
+            <div class="card-back"><img src="anime1.png" alt="الوجه الخلفي"></div>
+            <div class="dots"></div>
+        </div>
+    </div>
+    <!-- البطاقة 2 -->
+    <div class="card" data-dots="4">
+        <div class="card-inner">
+            <div class="card-front"><img src="logo.png" alt="الوجه الأمامي"></div>
+            <div class="card-back"><img src="anime2.png" alt="الوجه الخلفي"></div>
+            <div class="dots"></div>
+        </div>
+    </div>
+    <!-- البطاقة 3 -->
+    <div class="card" data-dots="2">
+        <div class="card-inner">
+            <div class="card-front"><img src="logo.png" alt="الوجه الأمامي"></div>
+            <div class="card-back"><img src="anime3.png" alt="الوجه الخلفي"></div>
+            <div class="dots"></div>
+        </div>
+    </div>
+    <!-- البطاقة 4 -->
+    <div class="card" data-dots="2">
+        <div class="card-inner">
+            <div class="card-front"><img src="logo.png" alt="الوجه الأمامي"></div>
+            <div class="card-back"><img src="anime4.png" alt="الوجه الخلفي"></div>
+            <div class="dots"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const cards = document.querySelectorAll(".card");
+
+    // إضافة الدوائر لكل بطاقة حسب العدد المطلوب
+    cards.forEach(card => {
+        const dotsContainer = card.querySelector(".dots");
+        const numDots = parseInt(card.dataset.dots);
+        for (let i = 0; i < numDots; i++) {
+            const dot = document.createElement("div");
+            dot.classList.add("dot"); // تبدأ كل الدوائر مفعلة
+            dotsContainer.appendChild(dot);
+        }
+    });
+
+    // بعد 5 ثواني → إظهار البطاقات
+    setTimeout(() => {
+        cards.forEach(card => {
+            card.classList.add("show");
+        });
+        // بعد ثانية → قلب البطاقات للوجه الأمامي
+        setTimeout(() => {
+            cards.forEach(card => {
+                card.classList.add("flipped");
+            });
+        }, 1000);
+    }, 5000);
+
+    // عند النقر على أي دائرة
+    document.addEventListener("click", e => {
+        if (e.target.classList.contains("dot")) {
+            e.target.classList.toggle("off"); // إطفاء أو تشغيل الدائرة
+            const parentCard = e.target.closest(".card");
+            const allDots = parentCard.querySelectorAll(".dot");
+            const activeDots = parentCard.querySelectorAll(".dot:not(.off)");
+
+            // إذا أطفأت جميع الدوائر → اختفاء البطاقة
+            if (activeDots.length === 0) {
+                parentCard.classList.add("fade-out");
+                setTimeout(() => {
+                    parentCard.remove();
+                }, 1000);
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
